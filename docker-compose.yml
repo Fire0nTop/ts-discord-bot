@@ -3,19 +3,6 @@ version: "3.8"
 services:
   discord-bot:
     build: .
-    secrets:
-      - discord_token
-      - discord_client_id
-      - discord_guild_id
+    env_file:
+      - .env
     restart: unless-stopped
-
-secrets:
-  discord_token:
-    external: true
-    name: DISCORD_TOKEN
-  discord_client_id:
-    external: true
-    name: DISCORD_CLIENT_ID
-  discord_guild_id:
-    external: true
-    name: DISCORD_GUILD_ID
