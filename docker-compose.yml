@@ -1,24 +1,23 @@
-version: '3.8'
+version: "3.8"
 
 services:
   discord-bot:
-    build: .
-    container_name: discord-bot
-    restart: unless-stopped
+    image: yourusername/discord-bot:latest
     secrets:
       - discord_token
       - discord_client_id
       - discord_guild_id
+    deploy:
+      restart_policy:
+        condition: any
 
 secrets:
   discord_token:
     external: true
     name: DISCORD_TOKEN
-
   discord_client_id:
     external: true
     name: DISCORD_CLIENT_ID
-
   discord_guild_id:
     external: true
     name: DISCORD_GUILD_ID
