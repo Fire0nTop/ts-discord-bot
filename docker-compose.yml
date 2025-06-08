@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   discord-bot:
-    image: yourusername/discord-bot:latest
+    image: fire0ntop/ts-discord-bot:latest
     secrets:
       - discord_token
       - discord_client_id
