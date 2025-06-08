@@ -3,6 +3,7 @@ import {CommandHandler} from "../handlers/commandHandler";
 import {EventHandler} from "../handlers/eventHandler";
 import {Client, GatewayIntentBits, REST, Routes} from "discord.js";
 import {Logger} from "../utils/logger";
+import {env} from "../utils/env";
 
 export class Bot {
     private client: BotClient;
@@ -43,8 +44,8 @@ export class Bot {
     }
 
     private async deployCommands(): Promise<void> {
-        const token = process.env.TOKEN;
-        const clientId = process.env.CLIENT_ID;
+        const token = env.getToken()
+        const clientId = env.getClientId();
 
         if (!token) {
             Logger.error('TOKEN is required in .env file');
@@ -65,7 +66,7 @@ export class Bot {
 
             if (clientId) {
                 // Deploy to specific guild (instant)
-                const guildId = process.env.GUILD_ID;
+                const guildId = env.getGuildId();
                 if (guildId) {
                     await rest.put(
                         Routes.applicationGuildCommands(clientId, guildId),
