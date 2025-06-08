@@ -1,5 +1,6 @@
 import { Event, BotClient } from '../types';
 import { Logger } from '../utils/logger';
+import {ActivityType} from "discord.js"
 
 const event: Event<'ready'> = {
     name: 'ready',
@@ -9,7 +10,7 @@ const event: Event<'ready'> = {
         Logger.info(`Serving ${client.guilds.cache.size} servers with ${client.users.cache.size} users`);
 
         // Set bot activity
-        client.user?.setActivity('with TypeScript', { type: 0 });
+        client.user?.setActivity('your Questions', {type: ActivityType.Listening});
     }
 };
 

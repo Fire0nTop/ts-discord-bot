@@ -1,22 +1,34 @@
+import {logLevel} from "../types/logLevel";
+
 export class Logger {
-    private static log(level: string, message: string, ...args: unknown[]): void {
+    private static log(level: logLevel, message: string, ...args: unknown[]): void {
         const timestamp = new Date().toISOString();
-        console.log(`[${timestamp}] [${level}] ${message}`, ...args);
+        switch (level) {
+            case logLevel.Error:
+                console.error(`[${timestamp}] [${level.toUpperCase()}] ${message}`, ...args);
+                break;
+            case logLevel.Warn:
+                console.warn(`[${timestamp}] [${level.toUpperCase()}] ${message}`, ...args);
+                break;
+            default:
+                console.log(`[${timestamp}] [${level.toUpperCase()}] ${message}`, ...args);
+                break;
+        }
     }
 
     static info(message: string, ...args: unknown[]): void {
-        this.log('INFO', message, ...args);
+        this.log(logLevel.Info, message, ...args);
     }
 
     static warn(message: string, ...args: unknown[]): void {
-        this.log('WARN', message, ...args);
+        this.log(logLevel.Warn, message, ...args);
     }
 
     static error(message: string, ...args: unknown[]): void {
-        this.log('ERROR', message, ...args);
+        this.log(logLevel.Error, message, ...args);
     }
 
     static success(message: string, ...args: unknown[]): void {
-        this.log('SUCCESS', message, ...args);
+        this.log(logLevel.Success, message, ...args);
     }
 }
