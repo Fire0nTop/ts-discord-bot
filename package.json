@@ -1,0 +1,19 @@
+{
+  "name": "discord-bot-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0",
+    "glob": "^8.1.0"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "typescript": "^5.5.3"
+  },
+  "private": true
+}
