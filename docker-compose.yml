@@ -2,14 +2,12 @@ version: "3.8"
 
 services:
   discord-bot:
-    image: fire0ntop/ts-discord-bot:latest
+    build: .
     secrets:
       - discord_token
       - discord_client_id
       - discord_guild_id
-    deploy:
-      restart_policy:
-        condition: any
+    restart: unless-stopped
 
 secrets:
   discord_token:
