@@ -19,9 +19,22 @@ export class CommandHandler {
         const commandsPath = join(__dirname, '../commands');
 
         try {
-            const commandFiles = readdirSync(commandsPath).filter(file =>
-                file.endsWith('.ts') || file.endsWith('.js')
-            );
+            // Check if we're running compiled JS or TypeScript
+            const allFiles = readdirSync(commandsPath);
+            const hasJsFiles = allFiles.some(file => file.endsWith('.js') && !file.endsWith('.d.ts'));
+            const hasTsFiles = allFiles.some(file => file.endsWith('.ts') && !file.endsWith('.d.ts'));
+
+            let commandFiles: string[];
+            if (hasJsFiles) {
+                // Running compiled code - use .js files
+                commandFiles = allFiles.filter(file => file.endsWith('.js') && !file.endsWith('.d.ts'));
+            } else if (hasTsFiles) {
+                // Running with ts-node/tsx - use .ts files
+                commandFiles = allFiles.filter(file => file.endsWith('.ts') && !file.endsWith('.d.ts'));
+            } else {
+                Logger.warn('No command files found');
+                return;
+            }
 
             for (const file of commandFiles) {
                 const filePath = join(commandsPath, file);
@@ -48,10 +61,22 @@ export class CommandHandler {
     async reloadCommand(commandName: string): Promise<boolean> {
         try {
             const commandsPath = join(__dirname, '../commands');
-            const commandFiles = readdirSync(commandsPath);
-            const commandFile = commandFiles.find(file =>
-                file.startsWith(commandName) && (file.endsWith('.ts') || file.endsWith('.js'))
-            );
+            const allFiles = readdirSync(commandsPath);
+
+            // Check if we're running compiled JS or TypeScript
+            const hasJsFiles = allFiles.some(file => file.endsWith('.js') && !file.endsWith('.d.ts'));
+            const hasTsFiles = allFiles.some(file => file.endsWith('.ts') && !file.endsWith('.d.ts'));
+
+            let commandFile: string | undefined;
+            if (hasJsFiles) {
+                commandFile = allFiles.find(file =>
+                    file.startsWith(commandName) && file.endsWith('.js') && !file.endsWith('.d.ts')
+                );
+            } else if (hasTsFiles) {
+                commandFile = allFiles.find(file =>
+                    file.startsWith(commandName) && file.endsWith('.ts') && !file.endsWith('.d.ts')
+                );
+            }
 
             if (!commandFile) {
                 Logger.error(`Command file for ${commandName} not found`);

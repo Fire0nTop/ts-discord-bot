@@ -15,9 +15,22 @@ export class EventHandler {
         const eventsPath = join(__dirname, '../events');
 
         try {
-            const eventFiles = readdirSync(eventsPath).filter(file =>
-                file.endsWith('.ts') || file.endsWith('.js')
-            );
+            // Check if we're running compiled JS or TypeScript
+            const allFiles = readdirSync(eventsPath);
+            const hasJsFiles = allFiles.some(file => file.endsWith('.js') && !file.endsWith('.d.ts'));
+            const hasTsFiles = allFiles.some(file => file.endsWith('.ts') && !file.endsWith('.d.ts'));
+
+            let eventFiles: string[];
+            if (hasJsFiles) {
+                // Running compiled code - use .js files
+                eventFiles = allFiles.filter(file => file.endsWith('.js') && !file.endsWith('.d.ts'));
+            } else if (hasTsFiles) {
+                // Running with ts-node/tsx - use .ts files
+                eventFiles = allFiles.filter(file => file.endsWith('.ts') && !file.endsWith('.d.ts'));
+            } else {
+                Logger.warn('No event files found');
+                return;
+            }
 
             for (const file of eventFiles) {
                 const filePath = join(eventsPath, file);
