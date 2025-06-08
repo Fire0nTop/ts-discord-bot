@@ -7,7 +7,7 @@ yarn-debug.log*
 yarn-error.log*
 /.pnp
 .pnp.js
-src/.env
+.env
 .vscode/*
 .idea
 .idea/*

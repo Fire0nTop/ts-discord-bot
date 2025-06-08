@@ -1,7 +1,6 @@
 import { Collection } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
-import { pathToFileURL } from 'url';
 import { Command, BotClient } from '../types';
 import { Logger } from '../utils/logger';
 
@@ -38,9 +37,11 @@ export class CommandHandler {
 
             for (const file of commandFiles) {
                 const filePath = join(commandsPath, file);
-                // Convert Windows path to file:// URL for ESM compatibility
-                const fileUrl = pathToFileURL(filePath).href;
-                const commandModule = await import(fileUrl);
+
+                // Clear require cache for hot reloading
+                delete require.cache[require.resolve(filePath)];
+
+                const commandModule = require(filePath);
                 const command: Command = commandModule.default || commandModule;
 
                 if ('data' in command && 'execute' in command) {
@@ -58,7 +59,7 @@ export class CommandHandler {
         }
     }
 
-    async reloadCommand(commandName: string): Promise<boolean> {
+    reloadCommand(commandName: string): boolean {
         try {
             const commandsPath = join(__dirname, '../commands');
             const allFiles = readdirSync(commandsPath);
@@ -85,13 +86,10 @@ export class CommandHandler {
 
             const filePath = join(commandsPath, commandFile);
 
-            // Convert Windows path to file:// URL for ESM compatibility
-            const fileUrl = pathToFileURL(filePath).href;
+            // Clear require cache for hot reloading
+            delete require.cache[require.resolve(filePath)];
 
-            // Add cache-busting query parameter for reloading
-            const cacheBustedUrl = `${fileUrl}?update=${Date.now()}`;
-
-            const commandModule = await import(cacheBustedUrl);
+            const commandModule = require(filePath);
             const command: Command = commandModule.default || commandModule;
 
             if ('data' in command && 'execute' in command) {

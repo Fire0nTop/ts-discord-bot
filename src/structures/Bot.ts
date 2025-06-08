@@ -27,9 +27,9 @@ export class Bot {
 
     async start(): Promise<void> {
         try {
-            // Load handlers
-            await this.commandHandler.loadCommands();
-            await this.eventHandler.loadEvents();
+            // Load handlers (now synchronous)
+            this.commandHandler.loadCommands();
+            this.eventHandler.loadEvents();
 
             // Deploy commands to Discord
             await this.deployCommands();

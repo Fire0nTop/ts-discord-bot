@@ -1,6 +1,5 @@
 import { readdirSync } from 'fs';
 import { join } from 'path';
-import { pathToFileURL } from 'url';
 import { Event, BotClient } from '../types';
 import { Logger } from '../utils/logger';
 
@@ -11,7 +10,7 @@ export class EventHandler {
         this.client = client;
     }
 
-    async loadEvents(): Promise<void> {
+    loadEvents(): void {
         const eventsPath = join(__dirname, '../events');
 
         try {
@@ -34,9 +33,11 @@ export class EventHandler {
 
             for (const file of eventFiles) {
                 const filePath = join(eventsPath, file);
-                // Convert Windows path to file:// URL for ESM compatibility
-                const fileUrl = pathToFileURL(filePath).href;
-                const eventModule = await import(fileUrl);
+
+                // Clear require cache
+                delete require.cache[require.resolve(filePath)];
+
+                const eventModule = require(filePath);
                 const event: Event = eventModule.default || eventModule;
 
                 if ('name' in event && 'execute' in event) {
