@@ -1,9 +1,9 @@
-import {BotClient} from "../types";
-import {CommandHandler} from "../handlers/commandHandler";
-import {EventHandler} from "../handlers/eventHandler";
-import {Client, GatewayIntentBits, REST, Routes} from "discord.js";
-import {Logger} from "../utils/logger";
-import {env} from "../utils/env";
+import { BotClient } from "../types";
+import { CommandHandler } from "../handlers/commandHandler";
+import { EventHandler } from "../handlers/eventHandler";
+import { Client, GatewayIntentBits, REST, Routes } from "discord.js";
+import { Logger } from "../utils/logger";
+import { env } from "../utils/env";
 
 export class Bot {
     private client: BotClient;
@@ -17,7 +17,7 @@ export class Bot {
                 GatewayIntentBits.GuildMessages,
                 // Remove MessageContent and GuildMembers intents as they require verification
                 // GatewayIntentBits.MessageContent,
-                // GatewayIntentBits.GuildMembers
+                // GatewayIntentBots.GuildMembers
             ]
         }) as BotClient;
 
@@ -27,9 +27,11 @@ export class Bot {
 
     async start(): Promise<void> {
         try {
-            // Load handlers (now synchronous)
-            this.commandHandler.loadCommands();
-            this.eventHandler.loadEvents();
+            Logger.info('Starting bot initialization...');
+
+            // Load handlers (now properly async)
+            await this.commandHandler.loadCommands();
+            await this.eventHandler.loadEvents();
 
             // Deploy commands to Discord
             await this.deployCommands();
@@ -44,7 +46,7 @@ export class Bot {
     }
 
     private async deployCommands(): Promise<void> {
-        const token = env.getToken()
+        const token = env.getToken();
         const clientId = env.getClientId();
 
         if (!token) {
@@ -85,6 +87,30 @@ export class Bot {
         } catch (error) {
             Logger.error('Error deploying commands:', error);
         }
+    }
+
+    async reloadCommands(): Promise<void> {
+        await this.commandHandler.reloadAllCommands();
+        await this.deployCommands();
+    }
+
+    async reloadEvents(): Promise<void> {
+        await this.eventHandler.reloadEvents();
+    }
+
+    async reloadAll(): Promise<void> {
+        Logger.info('Reloading all handlers...');
+        await this.reloadCommands();
+        await this.reloadEvents();
+        Logger.success('All handlers reloaded successfully');
+    }
+
+    getCommandHandler(): CommandHandler {
+        return this.commandHandler;
+    }
+
+    getEventHandler(): EventHandler {
+        return this.eventHandler;
     }
 
     async shutdown(): Promise<void> {
